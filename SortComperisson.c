@@ -2,8 +2,9 @@
 #include<stdlib.h>
 #include <time.h>
 
-#define GNUPLOT 0
-#define INCREMENT 5
+#define GNUPLOT 1
+#define INCREMENT 1
+#define MAX_VECTOR 300
 
 // Function to Merge Arrays L and R into A. 
 // lefCount = number of elements in L
@@ -77,13 +78,15 @@ int main(){
 	int *vector1;
 	int *vector2;
 	int i;
+	int count=0;
 	clock_t start;
 	clock_t end;
 	float seconds1;
 	float seconds2;
 	srand(time(NULL));
 	
-	while(1){
+	while(count<MAX_VECTOR){
+		count++;
 		vector1=(int*)malloc(sizeof(int)*n);
 		vector2=(int*)malloc(sizeof(int)*n);
 		for(i=0;i<n;i++){

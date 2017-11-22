@@ -743,19 +743,19 @@ RTC_READ:
 ;Sees if the year is in the correct format as well
 CLOCK_INIT:
 
-	mov RTC_SECONDS, #00h
-	mov RTC_MINUTES, #00h
-	mov RTC_HOURS, #00h
+	mov RTC_SECONDS, #55h
+	mov RTC_MINUTES, #059h
+	mov RTC_HOURS, #23h
 	mov RTC_DAY, #01h
-	mov RTC_DATE, #01h
-	mov RTC_MONTH, #01h
-	mov RTC_YEAR, #70h
+	mov RTC_DATE, #31h
+	mov RTC_MONTH, #12h
+	mov RTC_YEAR, #99h
 	mov RTC_YEAR_HIGH, #19h
-	mov RTC_OLD_YEAR, #70h
+	mov RTC_OLD_YEAR, #99h
 	mov RTC_CONTROL, #00h
-	mov RTC_ALARM_SECONDS, #00h
-	mov RTC_ALARM_MINUTES, #00h
-	mov RTC_ALARM_HOURS, #07h
+	mov RTC_ALARM_SECONDS, #01h
+	mov RTC_ALARM_MINUTES, #000h
+	mov RTC_ALARM_HOURS, #00h
 
 	mov TWI_DATA, #RTC_SECONDS
 	mov TWI_DATA_SIZE, #0dh

@@ -1,0 +1,1898 @@
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 1
+
+
+
+
+
+       MCS-51 Family Macro Assembler   A S E M - 5 1   V 1.3
+       =====================================================
+
+
+
+	Source File:	twi.a51
+	Object File:	twi.hex
+	List File:	twi.lst
+
+
+
+ Line  I  Addr  Code            Source
+
+    1:				$NOMOD51
+    2:				$INCLUDE (reg_C51.inc)		;To add SFR definition in the ASEM-51 assembler
+    3: 1			$SAVE
+    4: 1			$NOLIST
+  212:				$INCLUDE (LCD.a51)
+  213: 1	B      00A5	RS equ P2.5						;Instruction enable LCD
+  214: 1	B      00A6	RW equ p2.6						;Write enable LCD
+  215: 1	B      00A7	EN equ p2.7						;Enable LCD
+  216: 1	N      0080	LCD_LINE1 equ 80h						;Display first line
+  217: 1	N      00C0	LCD_LINE2 equ 0c0h						;Display second line
+  218: 1
+  219: 1	N      5050	org 5050h
+  220: 1			;*
+  221: 1			;*	LCD_MOVE_CURSOR
+  222: 1			;*	Moves cursor to the position stored in the accumulator
+  223: 1			;*
+  224: 1  5050			LCD_MOVE_CURSOR:
+  225: 1  5050	F5 80			mov P0, A
+  226: 1  5052	C2 A5			clr RS
+  227: 1  5054	C2 A6			clr RW
+  228: 1  5056	D2 A7			setb EN
+  229: 1  5058	00			nop
+  230: 1  5059	C2 A7			clr EN
+  231: 1  505B	12 50 DC		call LCD_DELAY40
+  232: 1  505E	22			ret
+  233: 1
+  234: 1			;*
+  235: 1			;*	LCD_PRINT_MSG
+  236: 1			;*	Print the message pointed by DPTR
+  237: 1			;*	String must end with a 00h
+  238: 1			;*
+  239: 1  505F			LCD_PRINT_MSG:
+  240: 1  505F	C0 04			push 4
+  241: 1  5061	7C 00			mov r4, #00h
+  242: 1  5063				LCD_PRINT_MSG_LOOP:
+  243: 1  5063	EC			mov a, r4
+  244: 1  5064	93			movc a, @a+dptr
+  245: 1  5065	60 06			jz LCD_PRINT_MSG_EXIT
+  246: 1  5067	12 50 70		call LCD_PRINT_CHAR
+  247: 1  506A	0C			inc R4
+  248: 1  506B	80 F6			jmp LCD_PRINT_MSG_LOOP
+  249: 1  506D				LCD_PRINT_MSG_EXIT:
+  250: 1  506D	D0 04			pop 4
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 2
+
+
+
+ Line  I  Addr  Code            Source
+
+  251: 1  506F	22			ret
+  252: 1
+  253: 1			;*
+  254: 1			;*	LCD_PRINT_CHAR
+  255: 1			;*	Print the char stored in the accumulator
+  256: 1			;*
+  257: 1  5070			LCD_PRINT_CHAR:
+  258: 1  5070	C2 A7			clr EN
+  259: 1  5072	F5 80			mov P0, a
+  260: 1
+  261: 1  5074	D2 A5			setb RS
+  262: 1  5076	C2 A6			clr RW
+  263: 1
+  264: 1  5078	D2 A7			setb EN
+  265: 1  507A	00			nop
+  266: 1  507B	C2 A7			clr EN
+  267: 1
+  268: 1  507D	12 50 E8		call LCD_DELAY20
+  269: 1  5080	22			ret
+  270: 1
+  271: 1			;*
+  272: 1			;*	LCD_SETUP
+  273: 1			;*	Handles the LCD setup
+  274: 1			;*
+  275: 1  5081			LCD_SETUP:
+  276: 1  5081	C2 A7			clr EN
+  277: 1  5083	C2 A5			clr RS
+  278: 1  5085	C2 A6			clr RW
+  279: 1
+  280: 1  5087	74 0A			mov A, #0ah
+  281: 1  5089	F5 80			mov P0, A
+  282: 1
+  283: 1  508B	D2 A7			setb EN
+  284: 1  508D	00			nop
+  285: 1  508E	C2 A7			clr EN
+  286: 1
+  287: 1  5090	12 50 D0		call LCD_DELAY164
+  288: 1
+  289: 1  5093	74 0C			mov A, #0ch
+  290: 1  5095	F5 80			mov P0, A
+  291: 1
+  292: 1  5097	D2 A7			setb EN
+  293: 1  5099	00			nop
+  294: 1  509A	C2 A7			clr EN
+  295: 1
+  296: 1  509C	12 50 D0		call LCD_DELAY164
+  297: 1
+  298: 1  509F	74 01			mov A, #01h
+  299: 1  50A1	F5 80			mov P0, A
+  300: 1
+  301: 1  50A3	D2 A7			setb EN
+  302: 1  50A5	00			nop
+  303: 1  50A6	C2 A7			clr EN
+  304: 1
+  305: 1  50A8	12 50 D0		call LCD_DELAY164
+  306: 1
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 3
+
+
+
+ Line  I  Addr  Code            Source
+
+  307: 1  50AB	74 02			mov A, #02h
+  308: 1  50AD	F5 80			mov P0, A
+  309: 1
+  310: 1  50AF	D2 A7			setb EN
+  311: 1  50B1	00			nop
+  312: 1  50B2	C2 A7			clr EN
+  313: 1
+  314: 1  50B4	12 50 D0		call LCD_DELAY164
+  315: 1
+  316: 1  50B7	74 3C			mov A, #3ch
+  317: 1  50B9	F5 80			mov P0, A
+  318: 1
+  319: 1  50BB	D2 A7			setb EN
+  320: 1  50BD	00			nop
+  321: 1  50BE	C2 A7			clr EN
+  322: 1
+  323: 1  50C0	12 50 DC		call LCD_DELAY40
+  324: 1
+  325: 1  50C3	74 0F			mov A, #0fh
+  326: 1  50C5	F5 80			mov P0, A
+  327: 1
+  328: 1  50C7	D2 A7			setb EN
+  329: 1  50C9	00			nop
+  330: 1  50CA	C2 A7			clr EN
+  331: 1
+  332: 1  50CC	12 50 DC		call LCD_DELAY40
+  333: 1  50CF	22			ret
+  334: 1
+  335: 1  50D0			LCD_DELAY164:
+  336: 1  50D0	C0 07			push 7
+  337: 1  50D2	7F 45			mov r7, #45h
+  338: 1  50D4				LCD_DELAY164_LOOP:
+  339: 1  50D4	12 50 DC		call LCD_DELAY40
+  340: 1  50D7	DF FB			djnz r7, LCD_DELAY164_LOOP
+  341: 1  50D9	D0 07			pop 7
+  342: 1  50DB	22			ret
+  343: 1
+  344: 1  50DC			LCD_DELAY40:
+  345: 1  50DC	C0 07			push 7
+  346: 1  50DE	7F 02			mov r7, #02h
+  347: 1  50E0				LCD_DELAY40_LOOP:
+  348: 1  50E0	12 50 E8		call LCD_DELAY20
+  349: 1  50E3	DF FB			djnz r7, LCD_DELAY40_LOOP
+  350: 1  50E5	D0 07			pop 7
+  351: 1  50E7	22			ret
+  352: 1
+  353: 1  50E8			LCD_DELAY20:
+  354: 1  50E8	C0 07			push 7
+  355: 1  50EA	7F 20			mov r7, #20h
+  356: 1  50EC	DF FE			djnz r7, $
+  357: 1  50EE	D0 07			pop 7
+  358: 1  50F0	22			ret
+  359:
+  360:				;Variables and Flags
+  361:		B	 78	TWI_BUSY		BIT 2fh.0
+  362:		B	 79	TWI_READ		BIT 2fh.1
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 4
+
+
+
+ Line  I  Addr  Code            Source
+
+  363:		B	 7A	TWI_FAIL		BIT 2fh.2
+  364:		B	 7B	PRINT_ENABLE		BIT 2fh.3
+  365:		B	 7C	NEEDS_LEAP_YEAR		BIT 2fh.4
+  366:		N      0070	TWI_DATA		equ 70h
+  367:		N      0071	TWI_DATA_SIZE		equ 71h
+  368:		N      0072	TWI_DEBUG		equ 72h
+  369:		N      0073	VALUE			equ 73h
+  370:		N      0074	TIMER1_VAR		equ 74h
+  371:
+  372:		N      0049	RTC_ADDRESS			equ 49h
+  373:		N      0050	RTC_SECONDS			equ 50h
+  374:		N      0051	RTC_MINUTES			equ 51h
+  375:		N      0052	RTC_HOURS			equ 52h
+  376:		N      0053	RTC_DAY				equ 53h
+  377:		N      0054	RTC_DATE			equ 54h
+  378:		N      0055	RTC_MONTH			equ 55h
+  379:		N      0056	RTC_YEAR			equ 56h
+  380:		N      0057	RTC_CONTROL			equ 57h
+  381:		N      0058	RTC_ALARM_SECONDS	equ 58h
+  382:		N      0059	RTC_ALARM_MINUTES	equ 59h
+  383:		N      005A	RTC_ALARM_HOURS		equ 5ah
+  384:		N      005B	RTC_YEAR_HIGH		equ 5bh
+  385:		N      005C	RTC_OLD_YEAR		equ 5ch
+  386:
+  387:				;Constants
+  388:
+  389:				;TWI SSCON bits
+  390:		N      0020	STA		equ 20h
+  391:		N      0010	STO		equ 10h
+  392:		N      0008	SI		equ 08h
+  393:		N      0004	AA		equ 04h
+  394:
+  395:		N      0000	org 0000h
+  396:	  0000	02 01 00		ljmp MAIN
+  397:
+  398:		N      000B	org 000bh
+  399:	  000B	02 06 D5		ljmp TIMER0
+  400:
+  401:		N      001B	org 001bh
+  402:	  001B	02 06 C6		ljmp TIMER1
+  403:
+  404:		N      0043	org 0043h
+  405:	  0043	02 07 38		ljmp TWI_IT
+  406:
+  407:		N      0100	org 0100h
+  408:	  0100			MAIN:
+  409:	  0100	12 50 81		call LCD_SETUP
+  410:	  0103	C2 78			clr TWI_BUSY
+  411:	  0105	D2 C0			setb P4.0
+  412:	  0107	D2 C1			setb P4.1
+  413:	  0109	D2 7B			setb PRINT_ENABLE
+  414:	  010B	75 74 32		mov TIMER1_VAR, #50d
+  415:
+  416:	  010E	75 93 40		mov SSCON, #01000000b	;TWI Master mode with Fosc/256
+  417:	  0111	43 B1 02		orl IEN1, #00000010b	;Enable ETWI
+  418:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 5
+
+
+
+ Line  I  Addr  Code            Source
+
+  419:	  0114	75 B2 00		mov IPL1, #00h
+  420:	  0117	75 B3 02		mov IPH1, #02h			;TWI interrupt as high priority
+  421:
+  422:	  011A	75 89 11		mov TMOD, #11h
+  423:	  011D	75 8C 00		mov TH0, #00h
+  424:	  0120	75 8A 00		mov TL0, #00h
+  425:	  0123	75 8D B1		mov TH1, #0b1h
+  426:	  0126	75 8B DF		mov TL1, #0dfh
+  427:	  0129	D2 AB			setb Et1
+  428:	  012B	C2 8C			clr TR0
+  429:	  012D	C2 8E			clr TR1
+  430:	  012F	D2 A9			setb ET0
+  431:	  0131	75 B7 08		mov IPH0, #08h		;Interrupt priority
+  432:	  0134	D2 AF			setb EA
+  433:
+  434:	  0136	12 05 BC		call CLOCK_INIT
+  435:	  0139	D2 8C			setb TR0
+  436:
+  437:	  013B				MAIN_LOOP:
+  438:	  013B	12 08 06			call READ
+  439:	  013E	E5 73				mov A, VALUE
+  440:	  0140	64 2A				xrl A, #'*'
+  441:	  0142	60 08				jz J_NEW_CLOCK
+  442:	  0144	E5 73				mov A, VALUE
+  443:	  0146	64 23				xrl A, #'#'
+  444:	  0148	60 07				jz J_PRINT_ALARM
+  445:	  014A	80 EF				jmp MAIN_LOOP
+  446:
+  447:	  014C				J_NEW_CLOCK:
+  448:	  014C	12 02 A5			call ADD_TIME
+  449:	  014F	80 EA				jmp MAIN_LOOP
+  450:	  0151				J_PRINT_ALARM:
+  451:	  0151	12 01 56			call PRINT_ALARM
+  452:	  0154	80 E5				jmp MAIN_LOOP
+  453:
+  454:	  0156			PRINT_ALARM:
+  455:	  0156	C2 7B			clr PRINT_ENABLE
+  456:	  0158	12 50 81		call LCD_SETUP
+  457:	  015B	74 80			mov A, #LCD_LINE1
+  458:	  015D	24 03			add A, #03h
+  459:	  015F	12 50 50		call LCD_MOVE_CURSOR
+  460:
+  461:	  0162	E5 5A			mov A, RTC_ALARM_HOURS
+  462:	  0164	C4			swap A
+  463:	  0165	54 03			anl A, #03h
+  464:	  0167	24 30			add A, #'0'
+  465:	  0169	12 50 70		call LCD_PRINT_CHAR
+  466:	  016C	E5 5A			mov A, RTC_ALARM_HOURS
+  467:	  016E	54 0F			anl A, #0fh
+  468:	  0170	24 30			add A, #'0'
+  469:	  0172	12 50 70		call LCD_PRINT_CHAR
+  470:	  0175	74 3A			mov A, #':'
+  471:	  0177	12 50 70		call LCD_PRINT_CHAR
+  472:
+  473:	  017A	E5 59			mov A, RTC_ALARM_MINUTES
+  474:	  017C	C4			swap A
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 6
+
+
+
+ Line  I  Addr  Code            Source
+
+  475:	  017D	54 0F			anl A, #0fh
+  476:	  017F	24 30			add A, #'0'
+  477:	  0181	12 50 70		call LCD_PRINT_CHAR
+  478:	  0184	E5 59			mov A, RTC_ALARM_MINUTES
+  479:	  0186	54 0F			anl A, #0fh
+  480:	  0188	24 30			add A, #'0'
+  481:	  018A	12 50 70		call LCD_PRINT_CHAR
+  482:	  018D	74 3A			mov A, #':'
+  483:	  018F	12 50 70		call LCD_PRINT_CHAR
+  484:
+  485:	  0192	E5 58			mov A, RTC_ALARM_SECONDS
+  486:	  0194	C4			swap A
+  487:	  0195	54 07			anl A, #07h
+  488:	  0197	24 30			add A, #'0'
+  489:	  0199	12 50 70		call LCD_PRINT_CHAR
+  490:	  019C	E5 58			mov A, RTC_ALARM_SECONDS
+  491:	  019E	54 0F			anl A, #0fh
+  492:	  01A0	24 30			add A, #'0'
+  493:	  01A2	12 50 70		call LCD_PRINT_CHAR
+  494:
+  495:	  01A5				PRINT_ALARM_LOOP:
+  496:	  01A5	12 08 06			call READ
+  497:	  01A8	E5 73				mov A, VALUE
+  498:	  01AA	64 23				xrl A, #'#'
+  499:	  01AC	60 08				jz PRINT_ALARM_END
+  500:	  01AE	E5 73				mov A, VALUE
+  501:	  01B0	64 2A				xrl A, #'*'
+  502:	  01B2	60 08				jz EDIT_ALARM
+  503:	  01B4	80 EF				jmp PRINT_ALARM_LOOP
+  504:
+  505:	  01B6				PRINT_ALARM_END:
+  506:	  01B6	12 50 81		call LCD_SETUP
+  507:	  01B9	D2 7B			setb PRINT_ENABLE
+  508:	  01BB	22			ret
+  509:
+  510:	  01BC			EDIT_ALARM:
+  511:	  01BC	C2 8C			clr tr0
+  512:	  01BE	74 80			mov A, #LCD_LINE1
+  513:	  01C0	24 03			add A, #03h
+  514:	  01C2	12 50 50		call LCD_MOVE_CURSOR
+  515:
+  516:	  01C5	74 68			mov A, #'h'
+  517:	  01C7	12 50 70		call LCD_PRINT_CHAR
+  518:	  01CA	74 68			mov A, #'h'
+  519:	  01CC	12 50 70		call LCD_PRINT_CHAR
+  520:	  01CF	74 3A			mov A, #':'
+  521:	  01D1	12 50 70		call LCD_PRINT_CHAR
+  522:	  01D4	74 6D			mov A, #'m'
+  523:	  01D6	12 50 70		call LCD_PRINT_CHAR
+  524:	  01D9	74 6D			mov A, #'m'
+  525:	  01DB	12 50 70		call LCD_PRINT_CHAR
+  526:	  01DE	74 3A			mov A, #':'
+  527:	  01E0	12 50 70		call LCD_PRINT_CHAR
+  528:	  01E3	74 73			mov A, #'s'
+  529:	  01E5	12 50 70		call LCD_PRINT_CHAR
+  530:	  01E8	74 73			mov A, #'s'
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 7
+
+
+
+ Line  I  Addr  Code            Source
+
+  531:	  01EA	12 50 70		call LCD_PRINT_CHAR
+  532:
+  533:	  01ED	74 80			mov A, #LCD_LINE1
+  534:	  01EF	24 03			add A, #03h
+  535:	  01F1	12 50 50		call LCD_MOVE_CURSOR
+  536:
+  537:	  01F4				SET_ALARM_HOUR_1:
+  538:	  01F4	12 08 06			call read
+  539:	  01F7	C3				clr C
+  540:	  01F8	E5 73				mov A, VALUE
+  541:	  01FA	94 03				subb A, #03h
+  542:	  01FC	50 F6				jnc SET_ALARM_HOUR_1
+  543:	  01FE	AD 73				mov r5, VALUE
+  544:	  0200	E5 73				mov a, VALUE
+  545:	  0202	24 30				add A, #'0'
+  546:	  0204	12 50 70			call LCD_PRINT_CHAR
+  547:	  0207				SET_ALARM_HOUR_2:
+  548:	  0207	12 08 06			call read
+  549:	  020A	ED				mov A, r5
+  550:	  020B	64 02				xrl A, #02h
+  551:	  020D	60 1F				jz SH2_ALARM_LESS_3
+  552:	  020F	C3				clr C
+  553:	  0210	E5 73				mov A, VALUE
+  554:	  0212	94 0A				subb A, #0ah
+  555:	  0214	50 F1				jnc SET_ALARM_HOUR_2
+  556:	  0216					SH2_ALARM_EXIT:
+  557:	  0216	AC 73					mov r4, VALUE
+  558:	  0218	E5 73					mov a, VALUE
+  559:	  021A	24 30					add A, #'0'
+  560:	  021C	12 50 70				call LCD_PRINT_CHAR
+  561:	  021F	74 3A					mov A, #':'
+  562:	  0221	12 50 70				call LCD_PRINT_CHAR
+  563:
+  564:	  0224	ED					mov A, r5
+  565:	  0225	C4					swap A
+  566:	  0226	54 30					anl A, #30h
+  567:	  0228	4C					orl A, r4
+  568:	  0229	F5 5A					mov RTC_ALARM_HOURS, A
+  569:	  022B	02 02 37				jmp SET_ALARM_MINUTE_1
+  570:	  022E					SH2_ALARM_LESS_3:
+  571:	  022E	C3					clr C
+  572:	  022F	E5 73					mov A, VALUE
+  573:	  0231	94 04					subb A, #04h
+  574:	  0233	50 D2					jnc SET_ALARM_HOUR_2
+  575:	  0235	80 DF					jmp SH2_ALARM_EXIT
+  576:	  0237				SET_ALARM_MINUTE_1:
+  577:	  0237	12 08 06			call read
+  578:	  023A	C3				clr C
+  579:	  023B	E5 73				mov A, VALUE
+  580:	  023D	94 06				subb A, #06h
+  581:	  023F	50 F6				jnc SET_ALARM_MINUTE_1
+  582:	  0241	AD 73				mov r5, VALUE
+  583:	  0243	E5 73				mov a, VALUE
+  584:	  0245	24 30				add A, #'0'
+  585:	  0247	12 50 70			call LCD_PRINT_CHAR
+  586:	  024A				SET_ALARM_MINUTE_2:
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 8
+
+
+
+ Line  I  Addr  Code            Source
+
+  587:	  024A	12 08 06			call read
+  588:	  024D	C3				clr C
+  589:	  024E	E5 73				mov A, VALUE
+  590:	  0250	94 0A				subb A, #0ah
+  591:	  0252	50 F6				jnc SET_ALARM_MINUTE_2
+  592:	  0254	AC 73				mov r4, VALUE
+  593:	  0256	E5 73				mov a, VALUE
+  594:	  0258	24 30				add A, #'0'
+  595:	  025A	12 50 70			call LCD_PRINT_CHAR
+  596:	  025D	74 3A				mov A, #':'
+  597:	  025F	12 50 70			call LCD_PRINT_CHAR
+  598:
+  599:	  0262	ED				mov A, r5
+  600:	  0263	C4				swap A
+  601:	  0264	4C				orl A, r4
+  602:	  0265	F5 59				mov RTC_ALARM_MINUTES, A
+  603:	  0267	02 02 6A			jmp SET_ALARM_SECOND_1
+  604:
+  605:	  026A				SET_ALARM_SECOND_1:
+  606:	  026A	12 08 06			call read
+  607:	  026D	C3				clr C
+  608:	  026E	E5 73				mov A, VALUE
+  609:	  0270	94 06				subb A, #06h
+  610:	  0272	50 F6				jnc SET_ALARM_SECOND_1
+  611:	  0274	AD 73				mov r5, VALUE
+  612:	  0276	E5 73				mov a, VALUE
+  613:	  0278	24 30				add A, #'0'
+  614:	  027A	12 50 70			call LCD_PRINT_CHAR
+  615:	  027D				SET_ALARM_SECOND_2:
+  616:	  027D	12 08 06			call read
+  617:	  0280	C3				clr C
+  618:	  0281	E5 73				mov A, VALUE
+  619:	  0283	94 0A				subb A, #0ah
+  620:	  0285	50 F6				jnc SET_ALARM_SECOND_2
+  621:	  0287	AC 73				mov r4, VALUE
+  622:	  0289	E5 73				mov a, VALUE
+  623:	  028B	24 30				add A, #'0'
+  624:	  028D	12 50 70			call LCD_PRINT_CHAR
+  625:
+  626:	  0290	ED				mov A, r5
+  627:	  0291	C4				swap A
+  628:	  0292	4C				orl A, r4
+  629:	  0293	F5 58				mov RTC_ALARM_SECONDS, A
+  630:
+  631:	  0295	75 49 08		mov RTC_ADDRESS, #08h
+  632:	  0298	75 70 58		mov TWI_DATA, #RTC_ALARM_SECONDS
+  633:	  029B	75 71 03		mov TWI_DATA_SIZE, #03h
+  634:	  029E	12 05 59		call RTC_WRITE
+  635:
+  636:	  02A1	D2 8C			setb tr0
+  637:	  02A3	21 B6			jmp PRINT_ALARM_END
+  638:
+  639:	  02A5			ADD_TIME:
+  640:	  02A5	C2 8C			clr tr0
+  641:	  02A7	C2 7C			clr NEEDS_LEAP_YEAR
+  642:					;Let's print the new screen
+
+ASEM-51 V1.3                                         Copyright (c) 2002 by W.W. Heinz                                         PAGE 9
+
+
+
+ Line  I  Addr  Code            Source
+
+  643:	  02A9	74 80			mov A, #LCD_LINE1
+  644:	  02AB	24 03			add A, #03h
+  645:	  02AD	12 50 50		call LCD_MOVE_CURSOR
+  646:
+  647:	  02B0	74 68			mov A, #'h'
+  648:	  02B2	12 50 70		call LCD_PRINT_CHAR
+  649:	  02B5	74 68			mov A, #'h'
+  650:	  02B7	12 50 70		call LCD_PRINT_CHAR
+  651:	  02BA	74 3A			mov A, #':'
+  652:	  02BC	12 50 70		call LCD_PRINT_CHAR
+  653:	  02BF	74 6D			mov A, #'m'
+  654:	  02C1	12 50 70		call LCD_PRINT_CHAR
+  655:	  02C4	74 6D			mov A, #'m'
+  656:	  02C6	12 50 70		call LCD_PRINT_CHAR
+  657:	  02C9	74 3A			mov A, #':'
+  658:	  02CB	12 50 70		call LCD_PRINT_CHAR
+  659:	  02CE	74 73			mov A, #'s'
+  660:	  02D0	12 50 70		call LCD_PRINT_CHAR
+  661:	  02D3	74 73			mov A, #'s'
+  662:	  02D5	12 50 70		call LCD_PRINT_CHAR
+  663:
+  664:	  02D8	74 C0			mov A, #LCD_LINE2
+  665:	  02DA	24 01			add A, #01h
+  666:	  02DC	12 50 50		call LCD_MOVE_CURSOR
+  667:
+  668:	  02DF	74 44			mov A, #'D'
+  669:	  02E1	12 50 70		call LCD_PRINT_CHAR
+  670:	  02E4	74 44			mov A, #'D'
+  671:	  02E6	12 50 70		call LCD_PRINT_CHAR
+  672:	  02E9	74 2F			mov A, #'/'
+  673:	  02EB	12 50 70		call LCD_PRINT_CHAR
+  674:	  02EE	74 4D			mov A, #'M'
+  675:	  02F0	12 50 70		call LCD_PRINT_CHAR
+  676:	  02F3	74 4D			mov A, #'M'
+  677:	  02F5	12 50 70		call LCD_PRINT_CHAR
+  678:	  02F8	74 2F			mov A, #'/'
+  679:	  02FA	12 50 70		call LCD_PRINT_CHAR
+  680:	  02FD	74 41			mov A, #'A'
+  681:	  02FF	12 50 70		call LCD_PRINT_CHAR
+  682:	  0302	74 41			mov A, #'A'
+  683:	  0304	12 50 70		call LCD_PRINT_CHAR
+  684:	  0307	74 41			mov A, #'A'
+  685:	  0309	12 50 70		call LCD_PRINT_CHAR
+  686:	  030C	74 41			mov A, #'A'
+  687:	  030E	12 50 70		call LCD_PRINT_CHAR
+  688:	  0311	74 20			mov A, #' '
+  689:	  0313	12 50 70		call LCD_PRINT_CHAR
+  690:	  0316	74 57			mov A, #'W'
+  691:	  0318	12 50 70		call LCD_PRINT_CHAR
+  692:	  031B	74 20			mov A, #' '
+  693:	  031D	12 50 70		call LCD_PRINT_CHAR
+  694:	  0320	74 20			mov A, #' '
+  695:	  0322	12 50 70		call LCD_PRINT_CHAR
+  696:
+  697:	  0325	74 80			mov A, #LCD_LINE1
+  698:	  0327	24 03			add A, #03h
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 10
+
+
+
+ Line  I  Addr  Code            Source
+
+  699:	  0329	12 50 50		call LCD_MOVE_CURSOR
+  700:
+  701:	  032C				SET_HOUR_1:
+  702:	  032C	12 08 06			call read
+  703:	  032F	C3				clr C
+  704:	  0330	E5 73				mov A, VALUE
+  705:	  0332	94 03				subb A, #03h
+  706:	  0334	50 F6				jnc SET_HOUR_1
+  707:	  0336	AD 73				mov r5, VALUE
+  708:	  0338	E5 73				mov a, VALUE
+  709:	  033A	24 30				add A, #'0'
+  710:	  033C	12 50 70			call LCD_PRINT_CHAR
+  711:	  033F				SET_HOUR_2:
+  712:	  033F	12 08 06			call read
+  713:	  0342	ED				mov A, r5
+  714:	  0343	64 02				xrl A, #02h
+  715:	  0345	60 1F				jz SH2_LESS_3
+  716:	  0347	C3				clr C
+  717:	  0348	E5 73				mov A, VALUE
+  718:	  034A	94 0A				subb A, #0ah
+  719:	  034C	50 F1				jnc SET_HOUR_2
+  720:	  034E					SH2_EXIT:
+  721:	  034E	AC 73					mov r4, VALUE
+  722:	  0350	E5 73					mov a, VALUE
+  723:	  0352	24 30					add A, #'0'
+  724:	  0354	12 50 70				call LCD_PRINT_CHAR
+  725:	  0357	74 3A					mov A, #':'
+  726:	  0359	12 50 70				call LCD_PRINT_CHAR
+  727:
+  728:	  035C	ED					mov A, r5
+  729:	  035D	C4					swap A
+  730:	  035E	54 30					anl A, #30h
+  731:	  0360	4C					orl A, r4
+  732:	  0361	F5 52					mov RTC_HOURS, A
+  733:	  0363	02 03 6F				jmp SET_MINUTE_1
+  734:	  0366					SH2_LESS_3:
+  735:	  0366	C3					clr C
+  736:	  0367	E5 73					mov A, VALUE
+  737:	  0369	94 04					subb A, #04h
+  738:	  036B	50 D2					jnc SET_HOUR_2
+  739:	  036D	80 DF					jmp SH2_EXIT
+  740:	  036F				SET_MINUTE_1:
+  741:	  036F	12 08 06			call read
+  742:	  0372	C3				clr C
+  743:	  0373	E5 73				mov A, VALUE
+  744:	  0375	94 06				subb A, #06h
+  745:	  0377	50 F6				jnc SET_MINUTE_1
+  746:	  0379	AD 73				mov r5, VALUE
+  747:	  037B	E5 73				mov a, VALUE
+  748:	  037D	24 30				add A, #'0'
+  749:	  037F	12 50 70			call LCD_PRINT_CHAR
+  750:	  0382				SET_MINUTE_2:
+  751:	  0382	12 08 06			call read
+  752:	  0385	C3				clr C
+  753:	  0386	E5 73				mov A, VALUE
+  754:	  0388	94 0A				subb A, #0ah
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 11
+
+
+
+ Line  I  Addr  Code            Source
+
+  755:	  038A	50 F6				jnc SET_MINUTE_2
+  756:	  038C	AC 73				mov r4, VALUE
+  757:	  038E	E5 73				mov a, VALUE
+  758:	  0390	24 30				add A, #'0'
+  759:	  0392	12 50 70			call LCD_PRINT_CHAR
+  760:	  0395	74 3A				mov A, #':'
+  761:	  0397	12 50 70			call LCD_PRINT_CHAR
+  762:
+  763:	  039A	ED				mov A, r5
+  764:	  039B	C4				swap A
+  765:	  039C	4C				orl A, r4
+  766:	  039D	F5 51				mov RTC_MINUTES, A
+  767:	  039F	02 03 A2			jmp SET_SECOND_1
+  768:
+  769:	  03A2				SET_SECOND_1:
+  770:	  03A2	12 08 06			call read
+  771:	  03A5	C3				clr C
+  772:	  03A6	E5 73				mov A, VALUE
+  773:	  03A8	94 06				subb A, #06h
+  774:	  03AA	50 F6				jnc SET_SECOND_1
+  775:	  03AC	AD 73				mov r5, VALUE
+  776:	  03AE	E5 73				mov a, VALUE
+  777:	  03B0	24 30				add A, #'0'
+  778:	  03B2	12 50 70			call LCD_PRINT_CHAR
+  779:	  03B5				SET_SECOND_2:
+  780:	  03B5	12 08 06			call read
+  781:	  03B8	C3				clr C
+  782:	  03B9	E5 73				mov A, VALUE
+  783:	  03BB	94 0A				subb A, #0ah
+  784:	  03BD	50 F6				jnc SET_SECOND_2
+  785:	  03BF	AC 73				mov r4, VALUE
+  786:	  03C1	E5 73				mov a, VALUE
+  787:	  03C3	24 30				add A, #'0'
+  788:	  03C5	12 50 70			call LCD_PRINT_CHAR
+  789:
+  790:	  03C8	ED				mov A, r5
+  791:	  03C9	C4				swap A
+  792:	  03CA	4C				orl A, r4
+  793:	  03CB	F5 50				mov RTC_SECONDS, A
+  794:
+  795:	  03CD	74 C0			mov A, #LCD_LINE2
+  796:	  03CF	24 01			add A, #01h
+  797:	  03D1	12 50 50		call LCD_MOVE_CURSOR
+  798:
+  799:	  03D4				SET_DATE_1:
+  800:	  03D4	12 08 06			call READ
+  801:	  03D7	C3				clr C
+  802:	  03D8	E5 73				mov A, VALUE
+  803:	  03DA	94 04				subb A, #04h
+  804:	  03DC	50 F6				jnc SET_DATE_1
+  805:	  03DE	AD 73				mov r5, VALUE
+  806:	  03E0	E5 73				mov a, VALUE
+  807:	  03E2	24 30				add A, #'0'
+  808:	  03E4	12 50 70			call LCD_PRINT_CHAR
+  809:	  03E7				SET_DATE_2:
+  810:	  03E7	12 08 06			call READ
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 12
+
+
+
+ Line  I  Addr  Code            Source
+
+  811:	  03EA	ED				mov a, r5
+  812:	  03EB	64 03				xrl a, #03h
+  813:	  03ED	60 22				jz SD2T
+  814:	  03EF	C3				clr C
+  815:	  03F0	E5 73				mov A, VALUE
+  816:	  03F2	94 0A				subb A, #0ah
+  817:	  03F4	50 F1				jnc SET_DATE_2
+  818:	  03F6					SDT2_CONTINUE:
+  819:	  03F6	E5 73				mov A, VALUE
+  820:	  03F8	4D				orl A, r5
+  821:	  03F9	60 EC				jz SET_DATE_2
+  822:	  03FB	AC 73				mov r4, VALUE
+  823:	  03FD	E5 73				mov a, VALUE
+  824:	  03FF	24 30				add A, #'0'
+  825:	  0401	12 50 70			call LCD_PRINT_CHAR
+  826:	  0404	74 2F				mov A, #'/'
+  827:	  0406	12 50 70			call LCD_PRINT_CHAR
+  828:	  0409	ED				mov A, r5
+  829:	  040A	C4				swap A
+  830:	  040B	4C				orl A, r4
+  831:	  040C	F5 54				mov RTC_DATE, A
+  832:	  040E	02 04 1A			jmp SET_MONTH_1
+  833:	  0411					SD2T:
+  834:	  0411	C3					clr C
+  835:	  0412	E5 73					mov A, VALUE
+  836:	  0414	94 02					subb A, #02h
+  837:	  0416	50 CF					jnc SET_DATE_2
+  838:	  0418	80 DC					jmp SDT2_CONTINUE
+  839:	  041A				SET_MONTH_1:
+  840:	  041A	12 08 06			call READ
+  841:	  041D	C3				clr C
+  842:	  041E	E5 73				mov A, VALUE
+  843:	  0420	94 02				subb A, #02h
+  844:	  0422	50 F6				jnc SET_MONTH_1
+  845:	  0424	AD 73				mov r5, VALUE
+  846:	  0426	E5 73				mov a, VALUE
+  847:	  0428	24 30				add A, #'0'
+  848:	  042A	12 50 70			call LCD_PRINT_CHAR
+  849:	  042D				SET_MONTH_2:
+  850:	  042D	12 08 06			call READ
+  851:	  0430	E5 73				mov A, VALUE
+  852:	  0432	4D				orl A, r5
+  853:	  0433	60 B2				jz SET_DATE_2
+  854:	  0435	ED				mov A, r5
+  855:	  0436	75 F0 0A			mov B, #0ah
+  856:	  0439	A4				mul AB
+  857:	  043A	25 73				add A, VALUE
+  858:	  043C	FC				mov r4,a
+  859:	  043D	64 02				xrl A, #02h
+  860:	  043F	70 0F				jnz SM2CC
+  861:	  0441	C3				clr C
+  862:	  0442	E5 54				mov A, RTC_DATE
+  863:	  0444	94 30				subb A, #30h
+  864:	  0446	50 E5				jnc SET_MONTH_2
+  865:	  0448	E5 54				mov A, RTC_DATE
+  866:	  044A	64 29				xrl A, #29h
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 13
+
+
+
+ Line  I  Addr  Code            Source
+
+  867:	  044C	70 02				jnz SM2CC
+  868:	  044E	D2 7C				setb NEEDS_LEAP_YEAR
+  869:	  0450					SM2CC:
+  870:	  0450	C3				clr C
+  871:	  0451	EC				mov A, r4
+  872:	  0452	94 08				subb A, #08h
+  873:	  0454	40 04				jc SM2C
+  874:	  0456	EC				mov a, r4
+  875:	  0457	C3				clr c
+  876:	  0458	94 07				subb a, #07h
+  877:	  045A					SM2C:
+  878:	  045A	54 01					anl a, #01h
+  879:	  045C	60 15					jz SM22
+  880:	  045E						SM2E:
+  881:	  045E	E5 73						mov a, VALUE
+  882:	  0460	24 30						add A, #'0'
+  883:	  0462	12 50 70					call LCD_PRINT_CHAR
+  884:	  0465	74 2F						mov A, #'/'
+  885:	  0467	12 50 70					call LCD_PRINT_CHAR
+  886:
+  887:	  046A	ED						mov A, r5
+  888:	  046B	C4						swap A
+  889:	  046C	45 73						orl A, VALUE
+  890:	  046E	F5 55						mov RTC_MONTH, A
+  891:	  0470	02 04 7B					jmp SET_YEAR_1
+  892:	  0473						SM22:
+  893:	  0473	E5 54						mov a, RTC_DATE
+  894:	  0475	94 31						subb a, #31h
+  895:	  0477	50 B4						jnc SET_MONTH_2
+  896:	  0479	80 E3						jmp SM2E
+  897:
+  898:	  047B				SET_YEAR_1:
+  899:	  047B	12 08 06			call READ
+  900:	  047E	E5 73				mov A, VALUE
+  901:	  0480	60 F9				jz SET_YEAR_1
+  902:	  0482	C3				clr C
+  903:	  0483	94 03				subb A, #03h
+  904:	  0485	50 F4				jnc SET_YEAR_1
+  905:	  0487	AD 73				mov r5, value
+  906:	  0489	E5 73				mov a, VALUE
+  907:	  048B	24 30				add A, #'0'
+  908:	  048D	12 50 70			call LCD_PRINT_CHAR
+  909:	  0490				SET_YEAR_2:
+  910:	  0490	12 08 06			call READ
+  911:	  0493	ED				mov a, r5
+  912:	  0494	64 01				xrl a, #01h
+  913:	  0496	60 15				jz SY2ONE
+  914:	  0498	E5 73				mov A, VALUE
+  915:	  049A	54 FE				anl A, #0feh
+  916:	  049C	70 F2				jnz SET_YEAR_2
+  917:	  049E	20 7C 14			jb NEEDS_LEAP_YEAR, SY22
+  918:	  04A1					SY2END:
+  919:	  04A1	AC 73				mov r4, VALUE
+  920:	  04A3	E5 73				mov a, VALUE
+  921:	  04A5	24 30				add A, #'0'
+  922:	  04A7	12 50 70			call LCD_PRINT_CHAR
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 14
+
+
+
+ Line  I  Addr  Code            Source
+
+  923:	  04AA	02 04 BD			jmp SET_YEAR_3
+  924:	  04AD					SY2ONE:
+  925:	  04AD	E5 73					mov A, VALUE
+  926:	  04AF	64 09					xrl A, #09h
+  927:	  04B1	70 DD					jnz SET_YEAR_2
+  928:	  04B3	80 EC					jmp SY2END
+  929:	  04B5					SY22:
+  930:	  04B5	E5 73					mov A, VALUE
+  931:	  04B7	64 01					xrl A, #01h
+  932:	  04B9	60 D5					jz SET_YEAR_2
+  933:	  04BB	80 E4					jmp SY2END
+  934:	  04BD				SET_YEAR_3:
+  935:	  04BD	12 08 06			call READ
+  936:	  04C0	EC				mov A, r4
+  937:	  04C1	64 09				xrl A, #09h
+  938:	  04C3	60 18				jz SY3SEVEN
+  939:	  04C5	EC				mov A, r4
+  940:	  04C6	64 01				xrl A, #01h
+  941:	  04C8	60 1D				jz SY3ONE
+  942:	  04CA	E5 73				mov A, VALUE
+  943:	  04CC					SY3C:
+  944:	  04CC	C3				clr C
+  945:	  04CD	94 0A				subb A, #0ah
+  946:	  04CF	50 EC				jnc SET_YEAR_3
+  947:	  04D1	AB 73				mov r3, value
+  948:	  04D3	E5 73				mov a, VALUE
+  949:	  04D5	24 30				add A, #'0'
+  950:	  04D7	12 50 70			call LCD_PRINT_CHAR
+  951:	  04DA	02 04 ED			jmp SET_YEAR_4
+  952:	  04DD					SY3SEVEN:
+  953:	  04DD	E5 73					mov A, VALUE
+  954:	  04DF	00					nop
+  955:	  04E0	C3					clr C
+  956:	  04E1	94 07					subb A, #07h
+  957:	  04E3	40 D8					jc SET_YEAR_3
+  958:	  04E5	80 E5					jmp SY3C
+  959:	  04E7					SY3ONE:
+  960:	  04E7	E5 73					mov A, VALUE
+  961:	  04E9	70 D2					jnz SET_YEAR_3
+  962:	  04EB	80 DF					jmp SY3C
+  963:
+  964:	  04ED				SET_YEAR_4:
+  965:	  04ED	12 08 06			call READ
+  966:	  04F0	EC				mov A, r4
+  967:	  04F1	64 01				xrl A, #01h
+  968:	  04F3	60 35				jz SY4ONE
+  969:	  04F5	E5 73				mov A, VALUE
+  970:	  04F7	C3				clr C
+  971:	  04F8	94 0A				subb A, #0ah
+  972:	  04FA	50 F1				jnc SET_YEAR_4
+  973:	  04FC	20 7C 1A			jb NEEDS_LEAP_YEAR, SY4_LEAP
+  974:	  04FF					SY4C:
+  975:	  04FF	E5 73				mov a, VALUE
+  976:	  0501	24 30				add A, #'0'
+  977:	  0503	12 50 70			call LCD_PRINT_CHAR
+  978:
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 15
+
+
+
+ Line  I  Addr  Code            Source
+
+  979:	  0506	ED				mov a, r5
+  980:	  0507	C4				swap A
+  981:	  0508	4C				orl A, r4
+  982:	  0509	F5 5B				mov RTC_YEAR_HIGH, A
+  983:
+  984:	  050B	EB				mov A, r3
+  985:	  050C	C4				swap A
+  986:	  050D	45 73				orl A, VALUE
+  987:	  050F	F5 56				mov RTC_YEAR, A
+  988:
+  989:	  0511	74 20				mov A, #' '
+  990:	  0513	12 50 70			call LCD_PRINT_CHAR
+  991:	  0516	02 05 30			jmp SET_DAY
+  992:	  0519					SY4_LEAP:
+  993:	  0519	EB					mov A, r3
+  994:	  051A	75 F0 0A				mov B, #0ah
+  995:	  051D	A4					mul AB
+  996:	  051E	25 73					add A, VALUE
+  997:	  0520	75 F0 04				mov B, #04h
+  998:	  0523	84					div AB
+  999:	  0524	E5 F0					mov A, B
+ 1000:	  0526	70 C5					jnz SET_YEAR_4
+ 1001:	  0528	80 D5					jmp SY4C
+ 1002:	  052A					SY4ONE:
+ 1003:	  052A	E5 73					mov A, VALUE
+ 1004:	  052C	70 BF					jnz SET_YEAR_4
+ 1005:	  052E	80 CF					jmp SY4C
+ 1006:
+ 1007:	  0530				SET_DAY:
+ 1008:	  0530	12 08 06			call READ
+ 1009:	  0533	E5 73				mov A, VALUE
+ 1010:	  0535	60 F9				jz SET_DAY
+ 1011:	  0537	C3				clr C
+ 1012:	  0538	94 08				subb A, #08h
+ 1013:	  053A	50 F4				jnc SET_DAY
+ 1014:	  053C	85 73 53			mov RTC_DAY, value
+ 1015:	  053F	E5 73				mov a, VALUE
+ 1016:	  0541	24 30				add A, #'0'
+ 1017:	  0543	12 50 70			call LCD_PRINT_CHAR
+ 1018:
+ 1019:	  0546				ADD_DATE_EXIT:
+ 1020:	  0546	75 49 00		mov RTC_ADDRESS, #00h
+ 1021:	  0549	E5 56			mov A, RTC_YEAR
+ 1022:	  054B	F5 5C			mov RTC_OLD_YEAR, A
+ 1023:	  054D	75 70 50		mov TWI_DATA, #RTC_SECONDS
+ 1024:	  0550	75 71 0D		mov TWI_DATA_SIZE, #0dh
+ 1025:	  0553	12 05 59		call RTC_WRITE
+ 1026:	  0556	D2 8C			setb TR0
+ 1027:	  0558	22			ret
+ 1028:
+ 1029:				;Write data to RTC
+ 1030:				;IN		RTC_ADDR		<- Address to write on the RTC RAM
+ 1031:				;IN		TWI_DATA		<- Pointer to transfer buffer
+ 1032:				;IN		TWI_DATA_SIZE	<- Number of bytes to transfer
+ 1033:				;OUT	TWI_FAIL		<- Set if failed occoured
+ 1034:	  0559			RTC_WRITE:
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 16
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1035:	  0559	C0 05			push 5
+ 1036:	  055B	C0 04			push 4
+ 1037:	  055D	C0 03			push 3
+ 1038:	  055F	AC 70			mov r4, TWI_DATA
+ 1039:	  0561	05 71			INC TWI_DATA_SIZE
+ 1040:	  0563	AD 71			mov r5, TWI_DATA_SIZE
+ 1041:	  0565	7B 02			mov r3, #02h						;Number of tries if error occoured
+ 1042:	  0567	C2 79			clr TWI_READ						;Just to be sure
+ 1043:	  0569				RTC_WRITE_ERROR:
+ 1044:	  0569	C2 7A				clr TWI_FAIL
+ 1045:	  056B	D2 78				setb TWI_BUSY
+ 1046:	  056D	43 93 20			orl SSCON, #STA					;Start
+ 1047:	  0570	20 78 FD			jb TWI_BUSY, $
+ 1048:	  0573	30 7A 06			jnb TWI_FAIL, RTC_WRITE_EXIT
+ 1049:	  0576	8C 70				mov TWI_DATA, r4
+ 1050:	  0578	8D 71				mov TWI_DATA_SIZE, r5
+ 1051:	  057A	DB ED				djnz r3, RTC_WRITE_ERROR
+ 1052:	  057C				RTC_WRITE_EXIT:
+ 1053:	  057C	D0 03			pop 3
+ 1054:	  057E	D0 04			pop 4
+ 1055:	  0580	D0 05			pop 5
+ 1056:	  0582	22			ret
+ 1057:
+ 1058:				;Read data from RTC
+ 1059:				;IN		RTC_ADDR		<- Address to read on the RTC RAM
+ 1060:				;IN		TWI_DATA		<- Pointer to transfer buffer
+ 1061:				;IN		TWI_DATA_SIZE	<- Number of bytes to transfer
+ 1062:				;OUT	TWI_FAIL		<- Set if failed occoured
+ 1063:	  0583			RTC_READ:
+ 1064:	  0583	C0 06			push 6
+ 1065:	  0585	C0 05			push 5
+ 1066:	  0587	C0 04			push 4
+ 1067:	  0589	C0 03			push 3
+ 1068:	  058B	AC 70			mov r4, TWI_DATA
+ 1069:	  058D	AD 71			mov r5, TWI_DATA_SIZE
+ 1070:	  058F	C3			clr C
+ 1071:	  0590	E5 49			mov A, RTC_ADDRESS
+ 1072:	  0592	94 01			subb A, #01h
+ 1073:	  0594	F5 49			mov RTC_ADDRESS, A
+ 1074:	  0596	AE 49			mov r6, RTC_ADDRESS
+ 1075:	  0598	7B 02			mov r3, #02h						;Number of tries if error occoured
+ 1076:	  059A				RTC_READ_ERROR:
+ 1077:	  059A	D2 79				setb TWI_READ					;We are reading
+ 1078:	  059C	C2 7A				clr TWI_FAIL
+ 1079:	  059E	D2 78				setb TWI_BUSY
+ 1080:	  05A0	43 93 20			orl SSCON, #STA					;Start
+ 1081:	  05A3	20 78 FD			jb TWI_BUSY, $
+ 1082:	  05A6	30 7A 08			jnb TWI_FAIL, RTC_READ_EXIT
+ 1083:	  05A9	8C 70				mov TWI_DATA, r4
+ 1084:	  05AB	8D 71				mov TWI_DATA_SIZE, r5
+ 1085:	  05AD	8E 49				mov RTC_ADDRESS, r6
+ 1086:	  05AF	DB E9				djnz r3, RTC_READ_ERROR
+ 1087:	  05B1				RTC_READ_EXIT:
+ 1088:	  05B1	C2 79			clr TWI_READ
+ 1089:	  05B3	D0 03			pop 3
+ 1090:	  05B5	D0 04			pop 4
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 17
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1091:	  05B7	D0 05			pop 5
+ 1092:	  05B9	D0 06			pop 6
+ 1093:	  05BB	22			ret
+ 1094:
+ 1095:				;Clock init
+ 1096:				;Makes sure that the hour is in the correct format
+ 1097:				;Loads the RTC
+ 1098:				;Sees if the year is in the correct format as well
+ 1099:	  05BC			CLOCK_INIT:
+ 1100:
+ 1101:	  05BC	75 50 00		mov RTC_SECONDS, #00h
+ 1102:	  05BF	75 51 00		mov RTC_MINUTES, #00h
+ 1103:	  05C2	75 52 00		mov RTC_HOURS, #00h
+ 1104:	  05C5	75 53 01		mov RTC_DAY, #01h
+ 1105:	  05C8	75 54 01		mov RTC_DATE, #01h
+ 1106:	  05CB	75 55 01		mov RTC_MONTH, #01h
+ 1107:	  05CE	75 56 70		mov RTC_YEAR, #70h
+ 1108:	  05D1	75 5B 19		mov RTC_YEAR_HIGH, #19h
+ 1109:	  05D4	75 5C 70		mov RTC_OLD_YEAR, #70h
+ 1110:	  05D7	75 57 00		mov RTC_CONTROL, #00h
+ 1111:	  05DA	75 58 00		mov RTC_ALARM_SECONDS, #00h
+ 1112:	  05DD	75 59 00		mov RTC_ALARM_MINUTES, #00h
+ 1113:	  05E0	75 5A 07		mov RTC_ALARM_HOURS, #07h
+ 1114:
+ 1115:	  05E3	75 70 50		mov TWI_DATA, #RTC_SECONDS
+ 1116:	  05E6	75 71 0D		mov TWI_DATA_SIZE, #0dh
+ 1117:	  05E9	75 49 00		mov RTC_ADDRESS, #00h
+ 1118:	  05EC	B1 59			call RTC_WRITE
+ 1119:
+ 1120:					;call DELAY_50MS
+ 1121:					;call DELAY_50MS
+ 1122:					;Lets be sure that CH is cleared
+ 1123:					;mov RTC_ADDRESS, #00h
+ 1124:					;mov TWI_DATA, #RTC_SECONDS
+ 1125:					;mov TWI_DATA_SIZE, #0dh
+ 1126:					;call RTC_READ
+ 1127:
+ 1128:					;mov RTC_SECONDS, #0ffh
+ 1129:					;mov RTC_ADDRESS, #00h
+ 1130:					;mov TWI_DATA, #RTC_SECONDS
+ 1131:					;mov TWI_DATA_SIZE, #02h
+ 1132:					;call RTC_WRITE
+ 1133:
+ 1134:					;mov RTC_SECONDS, #00h
+ 1135:					;mov RTC_DAY, #01h
+ 1136:					;anl RTC_SECONDS, #07Fh
+ 1137:					;anl RTC_HOURS, #0bfh
+ 1138:					;mov A, RTC_DAY
+ 1139:					;subb A, #08h
+ 1140:					;jc CLOCK_INIT_CONTINUE
+ 1141:					;mov RTC_DAY, #01h
+ 1142:					;CLOCK_INIT_CONTINUE:
+ 1143:					;mov A, RTC_DAY
+ 1144:					;jnz CLOCK_INIT_CONTINUE2
+ 1145:					;mov RTC_DAY, #01h
+ 1146:					;CLOCK_INIT_CONTINUE2:
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 18
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1147:					;mov RTC_ADDRESS, #00h
+ 1148:					;mov TWI_DATA, #RTC_SECONDS
+ 1149:					;mov TWI_DATA_SIZE, #0dh
+ 1150:					;call RTC_WRITE
+ 1151:
+ 1152:
+ 1153:
+ 1154:	  05EE	22			ret
+ 1155:
+ 1156:	  05EF			PRINT_DATE:
+ 1157:	  05EF	C0 01			push 1
+ 1158:	  05F1	74 80			mov A, #LCD_LINE1
+ 1159:	  05F3	24 03			add A, #03h
+ 1160:	  05F5	12 50 50		call LCD_MOVE_CURSOR
+ 1161:
+ 1162:	  05F8	E5 52			mov A, RTC_HOURS
+ 1163:	  05FA	C4			swap A
+ 1164:	  05FB	54 03			anl A, #03h
+ 1165:	  05FD	24 30			add A, #'0'
+ 1166:	  05FF	12 50 70		call LCD_PRINT_CHAR
+ 1167:	  0602	E5 52			mov A, RTC_HOURS
+ 1168:	  0604	54 0F			anl A, #0fh
+ 1169:	  0606	24 30			add A, #'0'
+ 1170:	  0608	12 50 70		call LCD_PRINT_CHAR
+ 1171:	  060B	74 3A			mov A, #':'
+ 1172:	  060D	12 50 70		call LCD_PRINT_CHAR
+ 1173:
+ 1174:	  0610	E5 51			mov A, RTC_MINUTES
+ 1175:	  0612	C4			swap A
+ 1176:	  0613	54 0F			anl A, #0fh
+ 1177:	  0615	24 30			add A, #'0'
+ 1178:	  0617	12 50 70		call LCD_PRINT_CHAR
+ 1179:	  061A	E5 51			mov A, RTC_MINUTES
+ 1180:	  061C	54 0F			anl A, #0fh
+ 1181:	  061E	24 30			add A, #'0'
+ 1182:	  0620	12 50 70		call LCD_PRINT_CHAR
+ 1183:	  0623	74 3A			mov A, #':'
+ 1184:	  0625	12 50 70		call LCD_PRINT_CHAR
+ 1185:
+ 1186:	  0628	E5 50			mov A, RTC_SECONDS
+ 1187:	  062A	C4			swap A
+ 1188:	  062B	54 07			anl A, #07h
+ 1189:	  062D	24 30			add A, #'0'
+ 1190:	  062F	12 50 70		call LCD_PRINT_CHAR
+ 1191:	  0632	E5 50			mov A, RTC_SECONDS
+ 1192:	  0634	54 0F			anl A, #0fh
+ 1193:	  0636	24 30			add A, #'0'
+ 1194:	  0638	12 50 70		call LCD_PRINT_CHAR
+ 1195:
+ 1196:	  063B	74 C0			mov A, #LCD_LINE2
+ 1197:	  063D	24 01			add A, #01h
+ 1198:	  063F	12 50 50		call LCD_MOVE_CURSOR
+ 1199:
+ 1200:	  0642	E5 54			mov A, RTC_DATE
+ 1201:	  0644	C4			swap A
+ 1202:	  0645	54 0F			anl A, #0fh
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 19
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1203:	  0647	24 30			add A, #'0'
+ 1204:	  0649	12 50 70		call LCD_PRINT_CHAR
+ 1205:	  064C	E5 54			mov A, RTC_DATE
+ 1206:	  064E	54 0F			anl A, #0fh
+ 1207:	  0650	24 30			add A, #'0'
+ 1208:	  0652	12 50 70		call LCD_PRINT_CHAR
+ 1209:	  0655	74 2F			mov A, #'/'
+ 1210:	  0657	12 50 70		call LCD_PRINT_CHAR
+ 1211:
+ 1212:	  065A	E5 55			mov A, RTC_MONTH
+ 1213:	  065C	C4			swap A
+ 1214:	  065D	54 0F			anl A, #0fh
+ 1215:	  065F	24 30			add A, #'0'
+ 1216:	  0661	12 50 70		call LCD_PRINT_CHAR
+ 1217:	  0664	E5 55			mov A, RTC_MONTH
+ 1218:	  0666	54 0F			anl A, #0fh
+ 1219:	  0668	24 30			add A, #'0'
+ 1220:	  066A	12 50 70		call LCD_PRINT_CHAR
+ 1221:	  066D	74 2F			mov A, #'/'
+ 1222:	  066F	12 50 70		call LCD_PRINT_CHAR
+ 1223:
+ 1224:	  0672	E5 5B			mov A, RTC_YEAR_HIGH
+ 1225:	  0674	C4			swap A
+ 1226:	  0675	54 0F			anl A, #0fh
+ 1227:	  0677	24 30			add A, #'0'
+ 1228:	  0679	12 50 70		call LCD_PRINT_CHAR
+ 1229:	  067C	E5 5B			mov A, RTC_YEAR_HIGH
+ 1230:	  067E	54 0F			anl A, #0fh
+ 1231:	  0680	24 30			add A, #'0'
+ 1232:	  0682	12 50 70		call LCD_PRINT_CHAR
+ 1233:	  0685	E5 56			mov A, RTC_YEAR
+ 1234:	  0687	C4			swap A
+ 1235:	  0688	54 0F			anl A, #0fh
+ 1236:	  068A	24 30			add A, #'0'
+ 1237:	  068C	12 50 70		call LCD_PRINT_CHAR
+ 1238:	  068F	E5 56			mov A, RTC_YEAR
+ 1239:	  0691	54 0F			anl A, #0fh
+ 1240:	  0693	24 30			add A, #'0'
+ 1241:	  0695	12 50 70		call LCD_PRINT_CHAR
+ 1242:	  0698	74 20			mov A, #' '
+ 1243:	  069A	12 50 70		call LCD_PRINT_CHAR
+ 1244:
+ 1245:					;Converts 0-7 in 'DOM' - 'SAB'
+ 1246:	  069D	C3			clr C
+ 1247:	  069E	A9 53			mov r1, RTC_DAY
+ 1248:	  06A0	E9			mov a, r1
+ 1249:	  06A1	70 02			jnz PC1
+ 1250:	  06A3	79 01			mov r1, #01h
+ 1251:	  06A5				PC1:
+ 1252:	  06A5	E9			mov a, r1
+ 1253:	  06A6	94 08			subb a, #08h
+ 1254:	  06A8	40 02			jc PC2
+ 1255:	  06AA	79 07			mov r1, #07h
+ 1256:	  06AC				PC2:
+ 1257:	  06AC	E9			mov A, r1
+ 1258:	  06AD	00			nop
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 20
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1259:	  06AE	14			dec A
+ 1260:	  06AF	75 F0 04		mov B, #04h
+ 1261:	  06B2	A4			mul AB
+ 1262:	  06B3	90 08 85		mov DPTR, #DAY_MSG
+ 1263:	  06B6	25 82			add A, DPL
+ 1264:	  06B8	F5 82			mov DPL, A
+ 1265:	  06BA	E5 83			mov A, DPH
+ 1266:	  06BC	34 00			addc A, #00h
+ 1267:	  06BE	F5 83			mov DPH, A
+ 1268:	  06C0	12 50 5F		call LCD_PRINT_MSG
+ 1269:	  06C3	D0 01			pop 1
+ 1270:	  06C5	22			ret
+ 1271:
+ 1272:	  06C6			TIMER1:
+ 1273:	  06C6	75 8D B1		mov TH1, #0b1h
+ 1274:	  06C9	75 8B DF		mov TL1, #0dfh
+ 1275:	  06CC	D5 74 05		djnz TIMER1_VAR, TIMER1_EXIT
+ 1276:	  06CF	75 74 32		mov TIMER1_VAR, #50d
+ 1277:	  06D2	B2 B6			cpl p3.6
+ 1278:	  06D4				TIMER1_EXIT:
+ 1279:	  06D4	32			reti
+ 1280:
+ 1281:				;Timer0 interrupt handler
+ 1282:	  06D5			TIMER0:
+ 1283:	  06D5	C0 E0			push ACC
+ 1284:	  06D7	C0 F0			push B
+ 1285:	  06D9	C0 D0			push PSW
+ 1286:	  06DB	75 8C 00		mov TH0, #00h
+ 1287:	  06DE	75 8A 00		mov TL0, #00h
+ 1288:
+ 1289:	  06E1	75 49 00		mov RTC_ADDRESS, #00h
+ 1290:	  06E4	75 70 50		mov TWI_DATA, #RTC_SECONDS
+ 1291:	  06E7	75 71 0D		mov TWI_DATA_SIZE, #0dh
+ 1292:
+ 1293:	  06EA	B1 83			call RTC_READ
+ 1294:
+ 1295:
+ 1296:	  06EC	E5 56			mov A, RTC_YEAR
+ 1297:	  06EE	60 0F			jz CHECK_CENTURY
+ 1298:
+ 1299:	  06F0	30 7B 05		jnb PRINT_ENABLE, TIMER0_EXIT
+ 1300:	  06F3	B1 EF			call PRINT_DATE
+ 1301:	  06F5	12 07 19		call CHECK_ALARM
+ 1302:	  06F8				TIMER0_EXIT:
+ 1303:	  06F8	D0 D0			pop PSW
+ 1304:	  06FA	D0 F0			pop B
+ 1305:	  06FC	D0 E0			pop ACC
+ 1306:	  06FE	32			reti
+ 1307:
+ 1308:	  06FF			CHECK_CENTURY:
+ 1309:	  06FF	E5 56			mov A, RTC_YEAR
+ 1310:	  0701	65 5C			xrl A, RTC_OLD_YEAR
+ 1311:	  0703	60 F3			jz	TIMER0_EXIT			;We didn't just changed centuries
+ 1312:	  0705	E5 5B			mov A, RTC_YEAR_HIGH
+ 1313:	  0707	24 01			add A, #01h
+ 1314:	  0709	D4			da A					;Fix BCD
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 21
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1315:	  070A	F5 5B			mov RTC_YEAR_HIGH, A
+ 1316:	  070C	75 5C 00		mov RTC_OLD_YEAR, #00h
+ 1317:
+ 1318:	  070F	30 7B 05		jnb PRINT_ENABLE, CHECK_CENTURY_EXIT
+ 1319:	  0712	B1 EF			call PRINT_DATE
+ 1320:	  0714	12 07 19		call CHECK_ALARM
+ 1321:
+ 1322:					;mov RTC_ADDRESS, #00h
+ 1323:					;mov TWI_DATA, #RTC_SECONDS
+ 1324:					;mov TWI_DATA_SIZE, #0dh
+ 1325:					;call RTC_WRITE			;Let's write our changes
+ 1326:	  0717				CHECK_CENTURY_EXIT:
+ 1327:	  0717	80 DF			jmp TIMER0_EXIT
+ 1328:
+ 1329:
+ 1330:	  0719			CHECK_ALARM:
+ 1331:	  0719	E5 52			mov A, RTC_HOURS
+ 1332:	  071B	65 5A			xrl A, RTC_ALARM_HOURS
+ 1333:	  071D	70 11			jnz CHECK_ALARM_EXIT
+ 1334:	  071F	E5 51			mov A, RTC_MINUTES
+ 1335:	  0721	65 59			xrl A, RTC_ALARM_MINUTES
+ 1336:	  0723	70 0B			jnz CHECK_ALARM_EXIT
+ 1337:	  0725	E5 50			mov A, RTC_SECONDS
+ 1338:	  0727	65 58			xrl A, RTC_ALARM_SECONDS
+ 1339:	  0729	70 05			jnz CHECK_ALARM_EXIT
+ 1340:	  072B	D2 8E			setb TR1
+ 1341:	  072D	02 07 31		jmp ALARM
+ 1342:	  0730				CHECK_ALARM_EXIT:
+ 1343:	  0730	22			ret
+ 1344:
+ 1345:	  0731			ALARM:
+ 1346:	  0731	12 08 06		call read
+ 1347:	  0734	C2 8E			clr tr1
+ 1348:	  0736	D2 B6			setb p3.6
+ 1349:				;Handle TWI interrupts
+ 1350:	  0738			TWI_IT:
+ 1351:	  0738	C0 E0			push ACC
+ 1352:	  073A	C0 D0			push PSW
+ 1353:
+ 1354:					;mov A, SSCS
+ 1355:					;swap A
+ 1356:					;anl A, #0fh
+ 1357:					;add A, #'0'
+ 1358:					;call LCD_PRINT_CHAR
+ 1359:					;mov A, SSCS
+ 1360:					;anl A, #0fh
+ 1361:					;add A, #'0'
+ 1362:					;call LCD_PRINT_CHAR
+ 1363:	  073C	E5 94			mov A, SSCS
+ 1364:	  073E	60 47			jz TWI_ERROR		;Code is 00h, error in the BUS
+ 1365:
+ 1366:	  0740	E5 94			mov A, SSCS
+ 1367:	  0742	64 08			xrl A, #08h
+ 1368:	  0744	60 50			jz TWI_START		;Code is 08h, Start codition has been transmitted
+ 1369:
+ 1370:	  0746	E5 94			mov A, SSCS
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 22
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1371:	  0748	64 10			xrl A, #10h
+ 1372:	  074A	60 52			jz TWI_RESTART		;Code is 10h, Repeated start codition has been transmitted
+ 1373:
+ 1374:	  074C	E5 94			mov A, SSCS
+ 1375:	  074E	64 18			xrl A, #18h
+ 1376:	  0750	60 54			jz TWI_SLAW_ACK		;Code is 18h, SLA+W transmitted with ACK received
+ 1377:
+ 1378:	  0752	E5 94			mov A, SSCS
+ 1379:	  0754	64 20			xrl A, #20h
+ 1380:	  0756	60 2F			jz TWI_ERROR		;Code is 20h, SLA+W transmitted with NACK received
+ 1381:
+ 1382:	  0758	E5 94			mov A, SSCS
+ 1383:	  075A	64 28			xrl A, #28h
+ 1384:	  075C	60 50			jz TWI_W_DATA_ACK	;Code is 28h, Data transmitted with ACK received
+ 1385:
+ 1386:	  075E	E5 94			mov A, SSCS
+ 1387:	  0760	64 30			xrl A, #30h
+ 1388:	  0762	60 23			jz TWI_ERROR		;Code is 30h, Data transmitted with NACK received
+ 1389:
+ 1390:	  0764	E5 94			mov A, SSCS
+ 1391:	  0766	64 38			xrl A, #38h
+ 1392:	  0768	60 1D			jz TWI_ERROR		;Code is 38h, Arbitration lost in SLAW or Data
+ 1393:
+ 1394:	  076A	E5 94			mov A, SSCS
+ 1395:	  076C	64 40			xrl A, #40h
+ 1396:	  076E	60 61			jz TWI_SLR_ACK		;Code is 40h, SLA+R transmitted with ACK received
+ 1397:
+ 1398:	  0770	E5 94			mov A, SSCS
+ 1399:	  0772	64 48			xrl A, #48h
+ 1400:	  0774	60 11			jz TWI_ERROR		;Code is 48h, SLA+R transmitted with NACK received
+ 1401:
+ 1402:	  0776	E5 94			mov A, SSCS
+ 1403:	  0778	64 50			xrl A, #50h
+ 1404:	  077A	60 65			jz TWI_R_DATA_ACK	;Code is 50h, Data read with ACK returned
+ 1405:
+ 1406:	  077C	E5 94			mov A, SSCS
+ 1407:	  077E	64 58			xrl A, #58h
+ 1408:	  0780	60 75			jz TWI_R_DATA_NACK	;Code is 58h, Data read with NACK returned
+ 1409:
+ 1410:	  0782				TWI_EXIT:
+ 1411:	  0782	D0 D0			pop PSW
+ 1412:	  0784	D0 E0			pop ACC
+ 1413:	  0786	32			reti
+ 1414:
+ 1415:	  0787			TWI_ERROR:
+ 1416:	  0787	85 94 72		mov TWI_DEBUG, SSCS
+ 1417:	  078A	53 93 D7		anl SSCON, #(NOT (SI OR STA))		;Clear STA, SI and AA, Just to be sure
+ 1418:	  078D	43 93 10		orl SSCON, #STO							;Stop
+ 1419:	  0790	C2 78			clr TWI_BUSY
+ 1420:	  0792	D2 7A			setb TWI_FAIL
+ 1421:	  0794	80 EC			jmp TWI_EXIT
+ 1422:
+ 1423:	  0796			TWI_START:
+ 1424:	  0796	75 95 D0		mov SSDAT, #11010000b					;RTC Address + W
+ 1425:	  0799	53 93 C7		anl SSCON, #(NOT (STA OR STO OR SI))	;Clear STA, SI and STO, Just to be sure
+ 1426:	  079C	80 E4			jmp TWI_EXIT
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 23
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1427:
+ 1428:	  079E			TWI_RESTART:
+ 1429:	  079E	75 95 D1		mov SSDAT, #11010001b					;RTC Address + R
+ 1430:	  07A1	53 93 C7		anl SSCON, #(NOT (STA OR STO OR SI))	;Clear STA, SI and STO, Just to be sure
+ 1431:	  07A4	80 DC			jmp TWI_EXIT
+ 1432:
+ 1433:	  07A6			TWI_SLAW_ACK:
+ 1434:	  07A6	85 49 95		mov SSDAT, RTC_ADDRESS
+ 1435:	  07A9	53 93 C7		anl SSCON, #(NOT (STA OR STO OR SI))	;Clear STA, SI and STO, Just to be sure
+ 1436:	  07AC	80 D4			jmp TWI_EXIT
+ 1437:
+ 1438:	  07AE			TWI_W_DATA_ACK:
+ 1439:	  07AE	20 79 18		jb TWI_READ, TWDAR
+ 1440:	  07B1	D5 71 0A		djnz TWI_DATA_SIZE, TWDAW
+ 1441:
+ 1442:	  07B4	53 93 D7		anl SSCON, #(NOT (STA OR SI))
+ 1443:	  07B7	43 93 10		orl SSCON, #STO
+ 1444:	  07BA	C2 78			clr TWI_BUSY
+ 1445:	  07BC	80 C4			jmp TWI_EXIT
+ 1446:
+ 1447:	  07BE				TWDAW:
+ 1448:	  07BE	A8 70				mov r0, TWI_DATA
+ 1449:	  07C0	86 95				mov SSDAT, @r0
+ 1450:	  07C2	53 93 C7			anl SSCON, #(NOT (STO OR STA OR SI))	;CLEAR STO, STA and SI
+ 1451:	  07C5	05 70				inc TWI_DATA
+ 1452:	  07C7	80 B9				jmp TWI_EXIT
+ 1453:
+ 1454:	  07C9				TWDAR:
+ 1455:	  07C9	53 93 E7			anl SSCON, #(NOT (STO OR SI))
+ 1456:	  07CC	43 93 20			orl SSCON, #STA						;Restart
+ 1457:	  07CF	80 B1				jmp TWI_EXIT
+ 1458:
+ 1459:	  07D1			TWI_SLR_ACK:
+ 1460:	  07D1	53 93 C7		anl SSCON, #(NOT (STA OR STO OR SI))	;Clear STA, SI and STO
+ 1461:	  07D4	D5 71 05		djnz TWI_DATA_SIZE, TSAR
+ 1462:
+ 1463:	  07D7	53 93 FB		anl SSCON, #(NOT AA)
+ 1464:	  07DA	80 A6			jmp TWI_EXIT
+ 1465:
+ 1466:	  07DC				TSAR:
+ 1467:	  07DC	43 93 04			orl SSCON, #AA
+ 1468:	  07DF	80 A1				jmp TWI_EXIT
+ 1469:
+ 1470:	  07E1			TWI_R_DATA_ACK:
+ 1471:	  07E1	A8 70			mov r0, TWI_DATA
+ 1472:	  07E3	A6 95			mov @r0, SSDAT
+ 1473:
+ 1474:					;call DEBUG
+ 1475:	  07E5	05 70			inc TWI_DATA
+ 1476:
+ 1477:
+ 1478:	  07E7	53 93 C7		anl SSCON, #(NOT (STA OR STO OR SI))
+ 1479:	  07EA	D5 71 05		djnz TWI_DATA_SIZE, TRDAR
+ 1480:
+ 1481:	  07ED	53 93 FB		anl SSCON, #(NOT AA)
+ 1482:	  07F0	80 90			jmp TWI_EXIT
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 24
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1483:	  07F2				TRDAR:
+ 1484:	  07F2	43 93 04			orl SSCON, #AA
+ 1485:	  07F5	80 8B				jmp TWI_EXIT
+ 1486:
+ 1487:	  07F7			TWI_R_DATA_NACK:
+ 1488:	  07F7	A8 70			mov r0, TWI_DATA
+ 1489:	  07F9	A6 95			mov @r0, SSDAT
+ 1490:	  07FB	53 93 D3		anl SSCON, #(NOT (STA OR SI OR AA))
+ 1491:	  07FE	43 93 10		orl SSCON, #STO
+ 1492:	  0801	C2 78			clr TWI_BUSY
+ 1493:	  0803	02 07 82		jmp TWI_EXIT
+ 1494:
+ 1495:	  0806			read:
+ 1496:	  0806	12 08 70		call delay_50ms
+ 1497:	  0809	75 90 F7		mov P1, #0F7h
+ 1498:	  080C	90 08 AA		mov DPTR, #input_line4
+ 1499:	  080F	30 90 36		jnb P1.0, read_column_3
+ 1500:	  0812	30 91 3B		jnb P1.1, read_column_2
+ 1501:	  0815	30 92 40		jnb P1.2, read_column_1
+ 1502:	  0818	75 90 EF		mov P1, #0EFh
+ 1503:	  081B	90 08 A7		mov DPTR, #input_line3
+ 1504:	  081E	30 90 27		jnb P1.0, read_column_3
+ 1505:	  0821	30 91 2C		jnb P1.1, read_column_2
+ 1506:	  0824	30 92 31		jnb P1.2, read_column_1
+ 1507:	  0827	75 90 DF		mov P1, #0DFh
+ 1508:	  082A	90 08 A4		mov DPTR, #input_line2
+ 1509:	  082D	30 90 18		jnb P1.0, read_column_3
+ 1510:	  0830	30 91 1D		jnb P1.1, read_column_2
+ 1511:	  0833	30 92 22		jnb P1.2, read_column_1
+ 1512:	  0836	75 90 BF		mov P1, #0BFh
+ 1513:	  0839	90 08 A1		mov DPTR, #input_line1
+ 1514:	  083C	30 90 09		jnb P1.0, read_column_3
+ 1515:	  083F	30 91 0E		jnb P1.1, read_column_2
+ 1516:	  0842	30 92 13		jnb P1.2, read_column_1
+ 1517:	  0845	80 BF			jmp read
+ 1518:	  0847	22			ret
+ 1519:
+ 1520:	  0848			read_column_3:
+ 1521:	  0848	74 02			mov A, #02h
+ 1522:	  084A	93			movc A, @A+DPTR
+ 1523:	  084B	F5 73			mov VALUE, A
+ 1524:	  084D	02 08 60		jmp read_delay
+ 1525:
+ 1526:	  0850			read_column_2:
+ 1527:	  0850	74 01			mov A, #01h
+ 1528:	  0852	93			movc A, @A+DPTR
+ 1529:	  0853	F5 73			mov VALUE, A
+ 1530:	  0855	02 08 60		jmp read_delay
+ 1531:
+ 1532:	  0858			read_column_1:
+ 1533:	  0858	74 00			mov A, #00h
+ 1534:	  085A	93			movc A, @A+DPTR
+ 1535:	  085B	F5 73			mov VALUE, A
+ 1536:	  085D	02 08 60		jmp read_delay
+ 1537:
+ 1538:	  0860			read_delay:
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 25
+
+
+
+ Line  I  Addr  Code            Source
+
+ 1539:	  0860	12 08 70		call delay_50ms
+ 1540:	  0863	30 90 FD		jnb P1.0, $
+ 1541:	  0866	30 91 FD		jnb P1.1, $
+ 1542:	  0869	30 92 FD		jnb P1.2, $
+ 1543:	  086C	12 08 70		call delay_50ms
+ 1544:	  086F	22			ret
+ 1545:
+ 1546:	  0870			delay_50ms:
+ 1547:	  0870	C0 06			push 6
+ 1548:	  0872	7E C8			mov r6, #0C8h
+ 1549:	  0874				delay_50ms_loop:
+ 1550:	  0874	12 08 7C		call delay_250u
+ 1551:	  0877	DE FB			djnz r6, delay_50ms_loop
+ 1552:	  0879	D0 06			pop 6
+ 1553:	  087B	22			ret
+ 1554:
+ 1555:	  087C			delay_250u:
+ 1556:	  087C	C0 07			push 7
+ 1557:	  087E	7F FA			mov r7, #0FAh
+ 1558:	  0880	DF FE			djnz r7, $
+ 1559:	  0882	D0 07			pop 7
+ 1560:	  0884	22			ret
+ 1561:
+ 1562:	  0885	44 4F 4D 00	DAY_MSG:	db	'DOM', 00h, 'SEG', 00h, 'TER', 00h, 'QUA', 00h, 'QUI', 00h, 'SEX', 00h, 'SAB
+	  0889	53 45 47 00	', 00h
+	  088D	54 45 52 00
+	  0891	51 55 41 00
+	  0895	51 55 49 00
+	  0899	53 45 58 00
+	  089D	53 41 42 00
+ 1563:
+ 1564:	  08A1	01 02 03	input_line1:			db 01h, 02h, 03h
+ 1565:	  08A4	04 05 06	input_line2:			db 04h, 05h, 06h
+ 1566:	  08A7	07 08 09	input_line3:			db 07h, 08h, 09h
+ 1567:	  08AA	2A 00 23	input_line4:			db '*', 00h, '#'
+ 1568:
+ 1569:				end
+
+
+
+
+
+                     register banks used:  ---
+
+                     no errors
+
+
+
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 26
+
+
+
+
+
+	       L I S T   O F   S Y M B O L S
+	       =============================
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+??ASEM_51			  NUMBER    8051
+??VERSION			  NUMBER    0130
+AA				  NUMBER    0004	 393
+AC				  BIT	      D6	  85
+ACC				  DATA	      E0	 102
+ADD_DATE_EXIT			  CODE	    0546	1019
+ADD_TIME			  CODE	    02A5	 639
+ALARM				  CODE	    0731	1345
+AUXR				  DATA	      8E	 117
+AUXR1				  DATA	      A2	 201
+B				  DATA	      F0	 103
+BDRCON				  DATA	      9B	 126
+BRL				  DATA	      9A	 125
+CCAP0H				  DATA	      FA	 167
+CCAP0L				  DATA	      EA	 174
+CCAP1H				  DATA	      FB	 168
+CCAP1L				  DATA	      EB	 175
+CCAP2H				  DATA	      FC	 169
+CCAP2L				  DATA	      EC	 176
+CCAP3H				  DATA	      FD	 170
+CCAP3L				  DATA	      ED	 177
+CCAP4H				  DATA	      FE	 171
+CCAP4L				  DATA	      EE	 178
+CCAPM0				  DATA	      DA	 159
+CCAPM1				  DATA	      DB	 160
+CCAPM2				  DATA	      DC	 161
+CCAPM3				  DATA	      DD	 162
+CCAPM4				  DATA	      DE	 163
+CCF0				  BIT	      D8	 100
+CCF1				  BIT	      D9	  99
+CCF2				  BIT	      DA	  98
+CCF3				  BIT	      DB	  97
+CCF4				  BIT	      DC	  96
+CCON				  DATA	      D8	  92
+CF				  BIT	      DF	  94
+CH				  DATA	      F9	 166
+CHECK_ALARM			  CODE	    0719	1330
+CHECK_ALARM_EXIT		  CODE	    0730	1342
+CHECK_CENTURY			  CODE	    06FF	1308
+CHECK_CENTURY_EXIT		  CODE	    0717	1326
+CKCON0				  DATA	      8F	 118
+CKCON1				  DATA	      AF	 140
+CKRL				  DATA	      97	 198
+CKSEL				  DATA	      85	 197
+CL				  DATA	      E9	 173
+CLOCK_INIT			  CODE	    05BC	1099
+CMOD				  DATA	      D9	 158
+CP_RL2				  BIT	      C8	  80
+CR				  BIT	      DE	  95
+CY				  BIT	      D7	  84
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 27
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+C_T2				  BIT	      C9	  79
+DAY_MSG				  CODE	    0885	1562
+DELAY_250U			  CODE	    087C	1555
+DELAY_50MS			  CODE	    0870	1546
+DELAY_50MS_LOOP			  CODE	    0874	1549
+DPH				  DATA	      83	 108
+DPL				  DATA	      82	 107
+EA				  BIT	      AF	  36
+EC				  BIT	      AE	  37
+EDIT_ALARM			  CODE	    01BC	 510
+EECON				  DATA	      D2	 207
+EN				  NUMBER    00A7	 215
+ES				  BIT	      AC	  39
+ET0				  BIT	      A9	  42
+ET1				  BIT	      AB	  40
+ET2				  BIT	      AD	  38
+EX0				  BIT	      A8	  43
+EX1				  BIT	      AA	  41
+EXEN2				  BIT	      CB	  77
+EXF2				  BIT	      CE	  74
+F0				  BIT	      D5	  86
+FCON				  DATA	      D1	 204
+IE0				  BIT	      89	  16
+IE1				  BIT	      8B	  14
+IEN0				  DATA	      A8	  34
+IEN1				  DATA	      B1	 143
+INPUT_LINE1			  CODE	    08A1	1564
+INPUT_LINE2			  CODE	    08A4	1565
+INPUT_LINE3			  CODE	    08A7	1566
+INPUT_LINE4			  CODE	    08AA	1567
+INT0				  BIT	      B2	  52
+INT1				  BIT	      B3	  51
+IPH0				  DATA	      B7	 146
+IPH1				  DATA	      B3	 145
+IPL0				  DATA	      B8	  60
+IPL1				  DATA	      B2	 144
+IT0				  BIT	      88	  17
+IT1				  BIT	      8A	  15
+J_NEW_CLOCK			  CODE	    014C	 447
+J_PRINT_ALARM			  CODE	    0151	 450
+KBE				  DATA	      9D	 129
+KBF				  DATA	      9E	 130
+KBLS				  DATA	      9C	 128
+LCD_DELAY164			  CODE	    50D0	 335
+LCD_DELAY164_LOOP		  CODE	    50D4	 338
+LCD_DELAY20			  CODE	    50E8	 353
+LCD_DELAY40			  CODE	    50DC	 344
+LCD_DELAY40_LOOP		  CODE	    50E0	 347
+LCD_LINE1			  NUMBER    0080	 216
+LCD_LINE2			  NUMBER    00C0	 217
+LCD_MOVE_CURSOR			  CODE	    5050	 224
+LCD_PRINT_CHAR			  CODE	    5070	 257
+LCD_PRINT_MSG			  CODE	    505F	 239
+LCD_PRINT_MSG_EXIT		  CODE	    506D	 249
+LCD_PRINT_MSG_LOOP		  CODE	    5063	 242
+LCD_SETUP			  CODE	    5081	 275
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 28
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+MAIN				  CODE	    0100	 408
+MAIN_LOOP			  CODE	    013B	 437
+NEEDS_LEAP_YEAR			  BIT	      7C	 365
+OSCCON				  DATA	      86	 196
+OV				  BIT	      D2	  89
+P				  BIT	      D0	  90
+P0				  DATA	      80	   7
+P1				  DATA	      90	  19
+P2				  DATA	      A0	  33
+P3				  DATA	      B0	  45
+P4				  DATA	      C0	  57
+P5				  DATA	      E8	  58
+PC1				  CODE	    06A5	1251
+PC2				  CODE	    06AC	1256
+PCON				  DATA	      87	 109
+PI2				  DATA	      F8	 187
+PI2_1				  BIT	      F9	 193
+PI2_O				  BIT	      F8	 192
+PPCL				  BIT	      BE	  62
+PRINT_ALARM			  CODE	    0156	 454
+PRINT_ALARM_END			  CODE	    01B6	 505
+PRINT_ALARM_LOOP		  CODE	    01A5	 495
+PRINT_DATE			  CODE	    05EF	1156
+PRINT_ENABLE			  BIT	      7B	 364
+PSL				  BIT	      BC	  64
+PSW				  DATA	      D0	  82
+PT0L				  BIT	      B9	  67
+PT1L				  BIT	      BB	  65
+PT2L				  BIT	      BD	  63
+PX0L				  BIT	      B8	  68
+PX1L				  BIT	      BA	  66
+RB8				  BIT	      9A	  28
+RCAP2H				  DATA	      CB	 154
+RCAP2L				  DATA	      CA	 153
+RCLK				  BIT	      CD	  75
+RD				  BIT	      B7	  47
+READ				  CODE	    0806	1495
+READ_COLUMN_1			  CODE	    0858	1532
+READ_COLUMN_2			  CODE	    0850	1526
+READ_COLUMN_3			  CODE	    0848	1520
+READ_DELAY			  CODE	    0860	1538
+REN				  BIT	      9C	  26
+RI				  BIT	      98	  30
+RS				  NUMBER    00A5	 213
+RS0				  BIT	      D3	  88
+RS1				  BIT	      D4	  87
+RTC_ADDRESS			  NUMBER    0049	 372
+RTC_ALARM_HOURS			  NUMBER    005A	 383
+RTC_ALARM_MINUTES		  NUMBER    0059	 382
+RTC_ALARM_SECONDS		  NUMBER    0058	 381
+RTC_CONTROL			  NUMBER    0057	 380
+RTC_DATE			  NUMBER    0054	 377
+RTC_DAY				  NUMBER    0053	 376
+RTC_HOURS			  NUMBER    0052	 375
+RTC_MINUTES			  NUMBER    0051	 374
+RTC_MONTH			  NUMBER    0055	 378
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 29
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+RTC_OLD_YEAR			  NUMBER    005C	 385
+RTC_READ			  CODE	    0583	1063
+RTC_READ_ERROR			  CODE	    059A	1076
+RTC_READ_EXIT			  CODE	    05B1	1087
+RTC_SECONDS			  NUMBER    0050	 373
+RTC_WRITE			  CODE	    0559	1034
+RTC_WRITE_ERROR			  CODE	    0569	1043
+RTC_WRITE_EXIT			  CODE	    057C	1052
+RTC_YEAR			  NUMBER    0056	 379
+RTC_YEAR_HIGH			  NUMBER    005B	 384
+RW				  NUMBER    00A6	 214
+RXD				  BIT	      B0	  54
+SADDR				  DATA	      A9	 139
+SADEN				  DATA	      B9	 149
+SBUF				  DATA	      99	 123
+SCON				  DATA	      98	  21
+SD2T				  CODE	    0411	 833
+SDT2_CONTINUE			  CODE	    03F6	 818
+SET_ALARM_HOUR_1		  CODE	    01F4	 537
+SET_ALARM_HOUR_2		  CODE	    0207	 547
+SET_ALARM_MINUTE_1		  CODE	    0237	 576
+SET_ALARM_MINUTE_2		  CODE	    024A	 586
+SET_ALARM_SECOND_1		  CODE	    026A	 605
+SET_ALARM_SECOND_2		  CODE	    027D	 615
+SET_DATE_1			  CODE	    03D4	 799
+SET_DATE_2			  CODE	    03E7	 809
+SET_DAY				  CODE	    0530	1007
+SET_HOUR_1			  CODE	    032C	 701
+SET_HOUR_2			  CODE	    033F	 711
+SET_MINUTE_1			  CODE	    036F	 740
+SET_MINUTE_2			  CODE	    0382	 750
+SET_MONTH_1			  CODE	    041A	 839
+SET_MONTH_2			  CODE	    042D	 849
+SET_SECOND_1			  CODE	    03A2	 769
+SET_SECOND_2			  CODE	    03B5	 779
+SET_YEAR_1			  CODE	    047B	 898
+SET_YEAR_2			  CODE	    0490	 909
+SET_YEAR_3			  CODE	    04BD	 934
+SET_YEAR_4			  CODE	    04ED	 964
+SH2_ALARM_EXIT			  CODE	    0216	 556
+SH2_ALARM_LESS_3		  CODE	    022E	 570
+SH2_EXIT			  CODE	    034E	 720
+SH2_LESS_3			  CODE	    0366	 734
+SI				  NUMBER    0008	 392
+SM0				  BIT	      9F	  23
+SM1				  BIT	      9E	  24
+SM2				  BIT	      9D	  25
+SM22				  CODE	    0473	 892
+SM2C				  CODE	    045A	 877
+SM2CC				  CODE	    0450	 869
+SM2E				  CODE	    045E	 880
+SP				  DATA	      81	 106
+SPCON				  DATA	      C3	 181
+SPDAT				  DATA	      C5	 183
+SPSTA				  DATA	      C4	 182
+SSADR				  DATA	      96	 191
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 30
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+SSCON				  DATA	      93	 188
+SSCS				  DATA	      94	 189
+SSDAT				  DATA	      95	 190
+STA				  NUMBER    0020	 390
+STO				  NUMBER    0010	 391
+SY22				  CODE	    04B5	 929
+SY2END				  CODE	    04A1	 918
+SY2ONE				  CODE	    04AD	 924
+SY3C				  CODE	    04CC	 943
+SY3ONE				  CODE	    04E7	 959
+SY3SEVEN			  CODE	    04DD	 952
+SY4C				  CODE	    04FF	 974
+SY4ONE				  CODE	    052A	1002
+SY4_LEAP			  CODE	    0519	 992
+T0				  BIT	      B4	  50
+T1				  BIT	      B5	  49
+T2CON				  DATA	      C8	  71
+T2MOD				  DATA	      C9	 152
+TB8				  BIT	      9B	  27
+TCLK				  BIT	      CC	  76
+TCON				  DATA	      88	   8
+TF0				  BIT	      8D	  12
+TF1				  BIT	      8F	  10
+TF2				  BIT	      CF	  73
+TH0				  DATA	      8C	 115
+TH1				  DATA	      8D	 116
+TH2				  DATA	      CD	 156
+TI				  BIT	      99	  29
+TIMER0				  CODE	    06D5	1282
+TIMER0_EXIT			  CODE	    06F8	1302
+TIMER1				  CODE	    06C6	1272
+TIMER1_EXIT			  CODE	    06D4	1278
+TIMER1_VAR			  NUMBER    0074	 370
+TL0				  DATA	      8A	 113
+TL1				  DATA	      8B	 114
+TL2				  DATA	      CC	 155
+TMOD				  DATA	      89	 112
+TR0				  BIT	      8C	  13
+TR1				  BIT	      8E	  11
+TR2				  BIT	      CA	  78
+TRDAR				  CODE	    07F2	1483
+TSAR				  CODE	    07DC	1466
+TWDAR				  CODE	    07C9	1454
+TWDAW				  CODE	    07BE	1447
+TWI_BUSY			  BIT	      78	 361
+TWI_DATA			  NUMBER    0070	 366
+TWI_DATA_SIZE			  NUMBER    0071	 367
+TWI_DEBUG			  NUMBER    0072	 368
+TWI_ERROR			  CODE	    0787	1415
+TWI_EXIT			  CODE	    0782	1410
+TWI_FAIL			  BIT	      7A	 363
+TWI_IT				  CODE	    0738	1350
+TWI_READ			  BIT	      79	 362
+TWI_RESTART			  CODE	    079E	1428
+TWI_R_DATA_ACK			  CODE	    07E1	1470
+TWI_R_DATA_NACK			  CODE	    07F7	1487
+
+ASEM-51 V1.3                                        Copyright (c) 2002 by W.W. Heinz                                         PAGE 31
+
+
+
+SYMBOL				  TYPE     VALUE	LINE
+------------------------------------------------------------
+TWI_SLAW_ACK			  CODE	    07A6	1433
+TWI_SLR_ACK			  CODE	    07D1	1459
+TWI_START			  CODE	    0796	1423
+TWI_W_DATA_ACK			  CODE	    07AE	1438
+TXD				  BIT	      B1	  53
+VALUE				  NUMBER    0073	 369
+WDTPRG				  DATA	      A7	 137
+WDTRST				  DATA	      A6	 136
+WR				  BIT	      B6	  48

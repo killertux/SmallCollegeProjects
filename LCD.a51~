@@ -4,7 +4,7 @@ EN equ p2.7						;Enable LCD
 LCD_LINE1 equ 80h						;Display first line
 LCD_LINE2 equ 0c0h						;Display second line
 
-org 5050h	
+org 4050h	
 ;*
 ;*	LCD_MOVE_CURSOR
 ;*	Moves cursor to the position stored in the accumulator
